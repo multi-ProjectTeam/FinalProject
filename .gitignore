@@ -15,6 +15,9 @@ local.properties
 .loadpath
 .recommenders
 
+# Images
+src/main/resources/static/image/
+
 # External tool builders
 .externalToolBuilders/
 
