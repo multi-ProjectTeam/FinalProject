@@ -8,6 +8,11 @@ import org.apache.ibatis.annotations.Update;
 import org.springframework.data.repository.query.Param;
 
 import com.example.finProject.dto.Enterprise;
+import com.example.finProject.dto.Image;
+import com.example.finProject.dto.Menu;
+import com.example.finProject.dto.Order;
+import com.example.finProject.dto.OrderDetail;
+import com.example.finProject.dto.Table;
 
 @Mapper
 public interface EnterpriseMapper {
@@ -46,4 +51,22 @@ public interface EnterpriseMapper {
 	
 	@Delete("Delete from enterprise where ENO=#{ENO}")
 	public void DELETEenterprise(@Param("ENO") int ENO);
+	
+	@Select("Select distinct mcategory from menu where eno=#{ENO}")
+	public String[] GETcategories(@Param("ENO")int ENO);
+	
+	@Select("Select * from image where eno=#{ENO}")
+	public Image[] GETimages(@Param("ENO")int ENO);
+	
+	@Select("Select * from `table` where eno=#{ENO}")
+	public Table[] GETtables(@Param("ENO")int ENO);
+	
+	@Select("Select * from `menu` where eno=#{ENO}")
+	public Menu[] GETmenus(@Param("ENO")int ENO);
+	
+	@Select("Select * from `order` where eno=#{ENO}")
+	public Order[] GETorders(@Param("ENO")int ENO);
+	
+	@Select("Select * from `orderdetail` where eno=#{ENO}")
+	public OrderDetail[] GETorderdetails(@Param("ENO")int ENO);
 }

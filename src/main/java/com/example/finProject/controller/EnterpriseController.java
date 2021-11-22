@@ -3,7 +3,6 @@ package com.example.finProject.controller;
 import java.util.Iterator;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.repository.query.Param;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,8 +14,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.finProject.dto.Enterprise;
+import com.example.finProject.dto.Image;
+import com.example.finProject.dto.Menu;
+import com.example.finProject.dto.Order;
+import com.example.finProject.dto.OrderDetail;
+import com.example.finProject.dto.Table;
 import com.example.finProject.mapper.EnterpriseMapper;
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
 @CrossOrigin(origins = "*", allowedHeaders = "*")
@@ -140,39 +145,107 @@ public class EnterpriseController {
 
 	// 카테고리(category) 레이어
 	@GetMapping("/{eno}/categories")
-	public String getCategories(@PathVariable("eno") String eno) {
-		return "Get Categories " + eno;
+	public String getCategories(@PathVariable("eno") int eno) {
+		String[] categories = mapper.GETcategories(eno);
+		
+		JsonObject result = new JsonObject();
+		Gson gson = new Gson();
+		JsonArray jsonArr =new JsonArray();
+		for( String category : categories) {
+			jsonArr.add(category);
+		}
+		result.add("categories", jsonArr);
+		
+		return result.toString();
 	}
 
-	
-	
 	// 이미지(image) 레이어
 	@GetMapping("/{eno}/images")
-	public String getImages(@PathVariable("eno") String eno) {
-		return "Get ImageS " + eno;
+	public String getImages(@PathVariable("eno") int eno) {
+		Image[] images = mapper.GETimages(eno); 
+		
+		JsonObject result = new JsonObject();
+		Gson gson = new Gson();
+		JsonArray jsonArr =new JsonArray();
+		for( Image element : images) {
+			JsonObject insertJson = gson.fromJson(gson.toJson(element), JsonObject.class);
+			jsonArr.add(insertJson);
+		}
+		
+		result.add("images", jsonArr);
+		
+		return result.toString();
 	}
 
 	// 테이블(table) 레이어
 	@GetMapping("/{eno}/tables")
-	public String getTables(@PathVariable("eno") String eno) {
-		return "Get Tables " + eno;
+	public String getTables(@PathVariable("eno") int eno) {
+		Table[] tables = mapper.GETtables(eno);
+		
+		JsonObject result = new JsonObject();
+		Gson gson = new Gson();
+		JsonArray jsonArr =new JsonArray();
+		for( Table element : tables) {
+			JsonObject insertJson = gson.fromJson(gson.toJson(element), JsonObject.class);
+			jsonArr.add(insertJson);
+		}
+		
+		result.add("tables", jsonArr);
+		
+		return result.toString();
 	}
 
 	// 메뉴(menu) 레이어
 	@GetMapping("/{eno}/menus")
-	public String getMenus(@PathVariable("eno") String eno) {
-		return "Get Menus " + eno;
+	public String getMenus(@PathVariable("eno") int eno) {
+		Menu[] menus = mapper.GETmenus(eno);
+
+		JsonObject result = new JsonObject();
+		Gson gson = new Gson();
+		JsonArray jsonArr =new JsonArray();
+		for( Menu element : menus) {
+			JsonObject insertJson = gson.fromJson(gson.toJson(element), JsonObject.class);
+			jsonArr.add(insertJson);
+		}
+		
+		result.add("menus", jsonArr);
+		
+		return result.toString();
 	}
 
 	// 주문(order) 레이어
 	@GetMapping("/{eno}/orders")
-	public String getOrders(@PathVariable("eno") String eno) {
-		return "Get Orders " + eno;
+	public String getOrders(@PathVariable("eno") int eno) {
+		Order[] orders = mapper.GETorders(eno);
+		
+		JsonObject result = new JsonObject();
+		Gson gson = new Gson();
+		JsonArray jsonArr =new JsonArray();
+		for( Order element : orders) {
+			JsonObject insertJson = gson.fromJson(gson.toJson(element), JsonObject.class);
+			jsonArr.add(insertJson);
+		}
+		
+		result.add("orders", jsonArr);
+		
+		return result.toString();
 	}
 
-	// 테이블(table) 레이어
+	// 주문상세(orderdetail) 레이어
 	@GetMapping("/{eno}/orderdetails")
-	public String getOrederDetails(@PathVariable("eno") String eno) {
-		return "Get OrederDetails " + eno;
+	public String getOrederDetails(@PathVariable("eno") int eno) {
+		OrderDetail[] od = mapper.GETorderdetails(eno);
+
+		JsonObject result = new JsonObject();
+		Gson gson = new Gson();
+		JsonArray jsonArr =new JsonArray();
+		for( OrderDetail element : od) {
+			JsonObject insertJson = gson.fromJson(gson.toJson(element), JsonObject.class);
+			jsonArr.add(insertJson);
+		}
+		
+		result.add("orderdetails", jsonArr);
+		
+		return result.toString();
 	}
 }

@@ -8,6 +8,7 @@ import org.apache.ibatis.annotations.Update;
 import org.springframework.data.repository.query.Param;
 
 import com.example.finProject.dto.Order;
+import com.example.finProject.dto.OrderDetail;
 
 @Mapper
 public interface OrderMapper {
@@ -28,4 +29,10 @@ public interface OrderMapper {
 	
 	@Delete("Delete from `order` where ocode=#{OCODE}")
 	public void DELETEorder(@Param("OCODE") int OCODE);
+
+	@Select("Select * from orderdetail where eno=#{ENO} and ocode=#{OCODE}")
+	public OrderDetail[] GETorderdetails(@Param("ENO")int ENO, @Param("OCODE")int OCODE);
+	
+	@Update("Update `order` set payment='Y', ptime=current_timestamp where ocode=#{OCODE}")
+	public void payment(@Param("OCODE")int OCODE);
 }
