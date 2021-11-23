@@ -9,7 +9,7 @@ import org.springframework.data.elasticsearch.annotations.Setting;
 import com.example.finProject.elasticsearch.helper.Indices;
 
 //엘라스틱 서치 인덱스 내에 생성되는 데이터베이스에서 row 역할(json 객체 단위로 생성)
-@Document(indexName=Indices.BUSINESS_INDEX)
+@Document(indexName=Indices.ENTERPRISE_INDEX)
 @Setting(settingPath = "static/es-settings.json")
 public class EnterpriseDocument {
 	@Id

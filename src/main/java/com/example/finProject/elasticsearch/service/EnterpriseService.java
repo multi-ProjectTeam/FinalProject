@@ -33,8 +33,8 @@ public class EnterpriseService {
 		this.repository = repository;
 	}
 	
-	public void save(final EnterpriseDocument business) {
-		repository.save(business);
+	public void save(final EnterpriseDocument enterprise) {
+		repository.save(enterprise);
 	}
 	
 	public EnterpriseDocument findById(final int eno) {
