@@ -77,7 +77,8 @@ public class EnterpriseController {
 	public Enterprise getEnterprise(@PathVariable("eno") int eno) {
 
 		Enterprise ent = mapper.GETenterprise(eno);
-
+		ent.setPassword(null);
+		
 		return ent;
 	}
 
