@@ -30,4 +30,10 @@ public interface TableMapper {
 	
 	@Delete("Delete from `table` where TNO=#{TNO}")
 	public void DELETEtable(@Param("TNO") int TNO);
+	
+	@Select("select count(tno) from etable where eno=${eno}")
+	public int getSeatNum(@Param("eno") int eno);
+	
+	@Select("select count(tno) from etable where eno=${eno} and state='y'")
+	public int getOccupiedNum(@Param("eno") int eno);
 }
