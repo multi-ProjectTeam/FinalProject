@@ -26,7 +26,7 @@ import com.google.gson.JsonObject;
 
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 @RestController
-@RequestMapping("/enterprise")
+@RequestMapping(value="/enterprise", produces="application/json;charset=utf8")
 public class EnterpriseController {
 
 	@Autowired

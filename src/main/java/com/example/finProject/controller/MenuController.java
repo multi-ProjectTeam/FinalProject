@@ -20,7 +20,7 @@ import com.google.gson.JsonObject;
 
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 @RestController
-@RequestMapping("/enterprise/{eno}/menu")
+@RequestMapping(value="/enterprise/{eno}/menu", produces="application/json;charset=utf8")
 public class MenuController {
 	
 	@Autowired

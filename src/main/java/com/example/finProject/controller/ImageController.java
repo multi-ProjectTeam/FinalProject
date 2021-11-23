@@ -21,7 +21,7 @@ import com.google.gson.JsonObject;
 
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 @RestController
-@RequestMapping("/enterprise/{eno}/image")
+@RequestMapping(value="/enterprise/{eno}/image", produces="application/json;charset=utf8")
 public class ImageController {
 	
 	@Autowired
