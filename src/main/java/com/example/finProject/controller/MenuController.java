@@ -1,6 +1,8 @@
 package com.example.finProject.controller;
 
+import java.lang.reflect.Type;
 import java.util.Iterator;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -17,6 +19,7 @@ import com.example.finProject.dto.Menu;
 import com.example.finProject.mapper.MenuMapper;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import com.google.gson.reflect.TypeToken;
 
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 @RestController
@@ -70,21 +73,39 @@ public class MenuController {
 			JsonObject insertJson = gson.fromJson(tempJson, JsonObject.class);
 			JsonObject json = gson.fromJson(param, JsonObject.class);
 			
-			Iterator<String> iterator = json.keySet().iterator();
+			Type type = new TypeToken<Map<String, Object>>() {}.getType();
+			Map<String, Object> nullRemover = gson.fromJson(param, type);
 			
-			while (iterator.hasNext()) {
-				String key = iterator.next();
-				if (key.equals("mcode"))
+			for( Iterator<Map.Entry<String, Object>> it = nullRemover.entrySet().iterator(); it.hasNext();) {
+				Map.Entry<String,Object> entry = it.next();
+				String key =entry.getKey();
+				if(key.equals("mcode"))
 					continue;
-				// 넘겨 받은 Json element의 타입에 따라서 설정.
-				// boolean의 경우 boolean으로, number의 경우 int로, 나머지는 string으로 받는다.
-				if (json.get(key).getAsJsonPrimitive().isBoolean())
-					insertJson.addProperty(key, json.get(key).getAsBoolean());
-				else if (json.get(key).getAsJsonPrimitive().isNumber())
-					insertJson.addProperty(key, json.get(key).getAsInt());
-				else
-					insertJson.addProperty(key, json.get(key).getAsString());
+				else if(entry.getValue() == null)
+					continue;
+				else {
+					if (insertJson.get(key).getAsJsonPrimitive().isBoolean())
+						insertJson.addProperty(key, json.get(key).getAsBoolean());
+					else if (insertJson.get(key).getAsJsonPrimitive().isNumber())
+						insertJson.addProperty(key, json.get(key).getAsInt());
+					else
+						insertJson.addProperty(key, json.get(key).getAsString());
+				}
 			}
+//			Iterator<String> iterator = json.keySet().iterator();
+//			while (iterator.hasNext()) {
+//				String key = iterator.next();
+//				if (key.equals("mcode"))
+//					continue;
+//				// 넘겨 받은 Json element의 타입에 따라서 설정.
+//				// boolean의 경우 boolean으로, number의 경우 int로, 나머지는 string으로 받는다.
+//				if (json.get(key).getAsJsonPrimitive().isBoolean())
+//					insertJson.addProperty(key, json.get(key).getAsBoolean());
+//				else if (json.get(key).getAsJsonPrimitive().isNumber())
+//					insertJson.addProperty(key, json.get(key).getAsInt());
+//				else
+//					insertJson.addProperty(key, json.get(key).getAsString());
+//			}
 			
 			mapper.PUTmenu(eno, insertJson.get("mname").getAsString(), insertJson.get("price").getAsInt(),
 				insertJson.get("mcomment").getAsString(), insertJson.get("mimage").getAsString(), 
