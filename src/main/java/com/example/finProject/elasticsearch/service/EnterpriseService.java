@@ -59,7 +59,7 @@ public class EnterpriseService {
 			 SearchHits<EnterpriseDocument> searchHits = elasticsearchOperations.search(
 				      searchQuery, 
 				      EnterpriseDocument.class,
-				      IndexCoordinates.of("business"));
+				      IndexCoordinates.of("enterprise"));
 			 
 			 for(SearchHit<EnterpriseDocument> hit : searchHits) {
 				 EnterpriseDocument business= hit.getContent();
@@ -75,7 +75,7 @@ public class EnterpriseService {
 	public  List<EnterpriseDocument> findBusinessByKeywordInRestaurant(final String search) {
 		List<EnterpriseDocument> list = new ArrayList<>();
 		BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
-		boolQueryBuilder.must(QueryBuilders.matchQuery("ecategory", "식당"));
+		boolQueryBuilder.must(QueryBuilders.matchQuery("ecategory", "음식점"));
 		boolQueryBuilder.must(QueryBuilders.multiMatchQuery(search)
 												.field("jibun_address")
 												.field("ecategory")
@@ -91,7 +91,7 @@ public class EnterpriseService {
 			SearchHits<EnterpriseDocument> searchHits = elasticsearchOperations.search(
 					nativeSearchQuery, 
 				      EnterpriseDocument.class,
-				      IndexCoordinates.of("business"));
+				      IndexCoordinates.of("enterprise"));
 			 
 			 for(SearchHit<EnterpriseDocument> hit : searchHits) {
 				 EnterpriseDocument business= hit.getContent();
@@ -122,7 +122,7 @@ public class EnterpriseService {
 			SearchHits<EnterpriseDocument> searchHits = elasticsearchOperations.search(
 					nativeSearchQuery, 
 				      EnterpriseDocument.class,
-				      IndexCoordinates.of("business"));
+				      IndexCoordinates.of("enterprise"));
 			 
 			 for(SearchHit<EnterpriseDocument> hit : searchHits) {
 				 EnterpriseDocument business= hit.getContent();
