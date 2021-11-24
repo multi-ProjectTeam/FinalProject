@@ -1,5 +1,6 @@
 package com.example.finProject.controller;
 
+import java.io.File;
 import java.lang.reflect.Type;
 import java.util.Iterator;
 import java.util.Map;
@@ -13,8 +14,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
+import com.example.finProject.Service.FilenameGenerator;
 import com.example.finProject.dto.Menu;
 import com.example.finProject.mapper.MenuMapper;
 import com.google.gson.Gson;
@@ -28,21 +32,34 @@ public class MenuController {
 	
 	@Autowired
 	private MenuMapper mapper;
+	
+	@Autowired
+	private FilenameGenerator fileNameGen;
 
 	@PostMapping("")
-	public String menu(@PathVariable("eno") int eno, @RequestBody String param) {
+	public String menu(@PathVariable("eno") int eno,
+			@RequestParam("files")MultipartFile file,
+			@RequestParam("data")String param) {
+		// 파일 받기
+		String fileName = fileNameGen.getFilename(file.getOriginalFilename());
+		String absPath = new File("").getAbsolutePath() + "\\src\\main\\resources\\static\\img\\" + fileName;
+		String urlPath = fileNameGen.getImageURL(fileName);
+		
 		JsonObject result = new JsonObject();
 		result.addProperty("status", false);
 		Gson gson = new Gson();
 		
 		try {
 			JsonObject json = gson.fromJson(param, JsonObject.class);
-			System.out.println(json);
+//			System.out.println(json);
 			
 			mapper.POSTmenu(eno, json.get("mname").getAsString(), json.get("price").getAsInt(),
-					json.get("mcomment").getAsString(), json.get("mimage").getAsString(), json.get("mcategory").getAsString());
+					json.get("mcomment").getAsString(), urlPath, json.get("mcategory").getAsString());
 			
 			int mcode = mapper.POSTmenuResponse(eno, json.get("mname").getAsString());
+			
+			// 파일 업로드
+			file.transferTo(new File(absPath));
 			
 			result.addProperty("mcode", mcode);
 			result.addProperty("status", true);
