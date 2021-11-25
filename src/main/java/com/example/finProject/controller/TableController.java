@@ -23,7 +23,7 @@ import com.google.gson.reflect.TypeToken;
 
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 @RestController
-@RequestMapping(value="/enterprise/{eno}/table", produces="application/json;charset=utf8")
+@RequestMapping(value="/enterprises/{eno}/tables", produces="application/json;charset=utf8")
 public class TableController {
 	
 	@Autowired

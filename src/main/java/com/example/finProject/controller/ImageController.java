@@ -27,7 +27,7 @@ import com.google.gson.reflect.TypeToken;
 
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 @RestController
-@RequestMapping(value = "/enterprise/{eno}/image", produces = "application/json;charset=utf8")
+@RequestMapping(value = "/enterprises/{eno}/images", produces = "application/json;charset=utf8")
 public class ImageController {
 
 	@Autowired
@@ -45,7 +45,7 @@ public class ImageController {
 
 		JsonObject result = new JsonObject();
 		result.addProperty("status", false);
-		Gson gson = new Gson();
+//		Gson gson = new Gson();
 
 		try {
 //			JsonObject json = gson.fromJson(param, JsonObject.class);

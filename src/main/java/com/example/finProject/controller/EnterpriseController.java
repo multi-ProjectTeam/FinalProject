@@ -29,7 +29,7 @@ import com.google.gson.reflect.TypeToken;
 
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 @RestController
-@RequestMapping(value="/enterprise", produces="application/json;charset=utf8")
+@RequestMapping(value="/enterprises", produces="application/json;charset=utf8")
 public class EnterpriseController {
 
 	@Autowired

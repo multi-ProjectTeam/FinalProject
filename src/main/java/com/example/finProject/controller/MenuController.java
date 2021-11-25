@@ -27,7 +27,7 @@ import com.google.gson.reflect.TypeToken;
 
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 @RestController
-@RequestMapping(value="/enterprise/{eno}/menu", produces="application/json;charset=utf8")
+@RequestMapping(value="/enterprises/{eno}/menus", produces="application/json;charset=utf8")
 public class MenuController {
 	
 	@Autowired
