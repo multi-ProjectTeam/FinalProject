@@ -9,12 +9,13 @@ import org.springframework.data.repository.query.Param;
 
 import com.example.finProject.dto.Order;
 import com.example.finProject.dto.OrderDetail;
+import com.example.finProject.dto.OrderDetailView;
 
 @Mapper
 public interface OrderMapper {
 
-	@Insert("Insert into `order`(eno,`otime`) values(#{ENO}, current_timestamp)")
-	public void POSTorder(@Param("ENO") int ENO);
+	@Insert("Insert into `order`(eno, total, `otime`) values(#{ENO}, #{TOTAL}, current_timestamp)")
+	public void POSTorder(@Param("ENO") int ENO, @Param("TOTAL") int TOTAL);
 	
 	@Select("Select ocode from `order` where eno=#{ENO} order by ocode desc limit 1")
 	public int POSTorderResponse(@Param("ENO") int ENO);

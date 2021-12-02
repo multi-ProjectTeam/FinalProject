@@ -40,21 +40,24 @@ public class BaseController {
 	@PostMapping("/login")
 	public String login(@RequestBody String param) {
 		JsonObject result = new JsonObject();
-		result.addProperty("status", false);
+
 		Gson gson = new Gson();
-		
+		Enterprise ent = null;
 		try {
 			JsonObject json = gson.fromJson(param, JsonObject.class);
 			System.out.println(json);
 			
-			Enterprise ent = mapper.Login(json.get("eno").getAsInt(), json.get("password").getAsString());
+			ent = mapper.Login(json.get("eno").getAsInt(), json.get("password").getAsString());
 			
-			if(ent != null)
+			if(ent != null) {
 				result.addProperty("status", true);
+			}else {
+				result.addProperty("status", false);
+			}
+				
 		}catch(Exception e) {
 			
 		}
-		
 		return result.toString();
 	}
 

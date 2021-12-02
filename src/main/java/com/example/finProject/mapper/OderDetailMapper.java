@@ -8,6 +8,7 @@ import org.apache.ibatis.annotations.Update;
 import org.springframework.data.repository.query.Param;
 
 import com.example.finProject.dto.OrderDetail;
+import com.example.finProject.dto.OrderDetailView;
 
 @Mapper
 public interface OderDetailMapper {
@@ -17,8 +18,11 @@ public interface OderDetailMapper {
 	public void POSTorderdetail(@Param("MCODE")int MCODE, @Param("ENO")int ENO,
 			@Param("OCODE")int OCODE, @Param("COUNT")int COUNT);
 	
-	@Select("Select odcode from orderdetail where eno=#{ENO} order by odcode desc limit 1")
-	public int POSTorderdetailResponse(@Param("ENO")int ENO);
+//	@Select("Select odcode from orderdetail where eno=#{ENO} order by odcode desc limit 1")
+//	public int POSTorderdetailResponse(@Param("ENO")int ENO);
+	
+	@Select("Select ocode, odcode, o.mcode, mname, count from orderdetail o inner join menu m on o.mcode = m.mcode where OCODE=#{OCODE} order by odcode desc")
+	public OrderDetailView[] POSTorderdetailResponse(@Param("OCODE")int OCODE);
 	
 	@Select("select * from orderdetail where odcode=#{ODCODE}")
 	public OrderDetail GETorderdetail(@Param("ODCODE")int ODCODE);

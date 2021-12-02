@@ -14,8 +14,10 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
 import com.example.finProject.dto.Order;
 import com.example.finProject.dto.OrderDetail;
+import com.example.finProject.dto.OrderDetailView;
 import com.example.finProject.mapper.OrderMapper;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -31,13 +33,16 @@ public class OrderController {
 	private OrderMapper mapper;
 
 	@PostMapping("")
-	public String order(@PathVariable("eno") int eno) {
+	public String order(@PathVariable("eno") int eno, @RequestBody String param) {
+		System.out.println(eno);
 		JsonObject result = new JsonObject();
 		result.addProperty("status", false);
-
+		Gson gson = new Gson();
+		
 		try {
-
-			mapper.POSTorder(eno);
+			JsonObject json = gson.fromJson(param, JsonObject.class);
+			System.out.println(json);
+			mapper.POSTorder(eno, json.get("total").getAsInt());
 
 			int ocode = mapper.POSTorderResponse(eno);
 

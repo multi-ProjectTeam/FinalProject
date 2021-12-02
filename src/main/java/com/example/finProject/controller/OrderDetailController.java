@@ -1,6 +1,7 @@
 package com.example.finProject.controller;
 
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -15,9 +16,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.finProject.dto.Menu;
 import com.example.finProject.dto.OrderDetail;
+import com.example.finProject.dto.OrderDetailView;
 import com.example.finProject.mapper.OderDetailMapper;
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 
@@ -29,6 +33,29 @@ public class OrderDetailController {
 	@Autowired
 	private OderDetailMapper mapper;
 
+//	@PostMapping("")
+//	public String orderDetail(@PathVariable("eno") int eno, @PathVariable("ocode") int ocode, @RequestBody String param) {
+//		JsonObject result = new JsonObject();
+//		result.addProperty("status", false);
+//		Gson gson = new Gson();
+//		
+//		try {
+//			JsonObject json = gson.fromJson(param, JsonObject.class);
+//			System.out.println(json);
+//			
+//			mapper.POSTorderdetail(json.get("mcode").getAsInt(), eno, ocode, json.get("count").getAsInt());
+//			
+//			int odcode = mapper.POSTorderdetailResponse(eno);
+//			
+//			result.addProperty("odcode", odcode);
+//			result.addProperty("status", true);
+//		}catch(Exception e) {
+//			e.printStackTrace();
+//		}
+//		
+//		return result.toString();
+//	}
+	
 	@PostMapping("")
 	public String orderDetail(@PathVariable("eno") int eno, @PathVariable("ocode") int ocode, @RequestBody String param) {
 		JsonObject result = new JsonObject();
@@ -36,14 +63,24 @@ public class OrderDetailController {
 		Gson gson = new Gson();
 		
 		try {
-			JsonObject json = gson.fromJson(param, JsonObject.class);
+			JsonObject obj = gson.fromJson(param,  JsonObject.class);
+			JsonArray json = gson.fromJson(obj.get("orderdetail"), JsonArray.class);
 			System.out.println(json);
 			
-			mapper.POSTorderdetail(json.get("mcode").getAsInt(), eno, ocode, json.get("count").getAsInt());
+			for(int i = 0; i < json.size(); i++) {
+				JsonObject jobj = new JsonObject();
+				jobj = (JsonObject) json.get(i);
+				mapper.POSTorderdetail(jobj.get("mcode").getAsInt(), eno, ocode, jobj.get("amount").getAsInt());
+			}
 			
-			int odcode = mapper.POSTorderdetailResponse(eno);
+			OrderDetailView[] orderList = mapper.POSTorderdetailResponse(ocode);
+			JsonArray jsonArray = new JsonArray();
+			for(OrderDetailView element : orderList) {
+				JsonObject insertJson = gson.fromJson(gson.toJson(element), JsonObject.class);
+				jsonArray.add(insertJson);
+			}
 			
-			result.addProperty("odcode", odcode);
+			result.add("orderList", jsonArray);
 			result.addProperty("status", true);
 		}catch(Exception e) {
 			e.printStackTrace();

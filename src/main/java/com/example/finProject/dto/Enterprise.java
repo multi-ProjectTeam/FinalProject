@@ -28,4 +28,6 @@ public class Enterprise {
 	private String eimage;
 	private String ecategory;
 	private Timestamp modification_time;
+	
+	public Enterprise() {}
 }

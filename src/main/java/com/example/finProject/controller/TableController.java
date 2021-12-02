@@ -5,6 +5,8 @@ import java.util.Iterator;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -50,6 +52,27 @@ public class TableController {
 		}
 		
 		return result.toString();
+	}
+	
+	@PostMapping("/{tno}/order")
+	public ResponseEntity<Integer> updateTableOrder(@PathVariable("eno")int eno, @PathVariable("tno")int tno, @RequestBody String param) {
+		JsonObject result = new JsonObject();
+		result.addProperty("status", false);
+		Gson gson = new Gson();
+		int state = 0;
+		
+		try {
+			JsonObject json = gson.fromJson(param, JsonObject.class);
+			state = mapper.updateTable(eno, tno, json.get("ocode").getAsInt());
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+		
+		if(state == 1) {
+			return new ResponseEntity<Integer>(1, HttpStatus.BAD_REQUEST.OK);
+		}else {
+			return new ResponseEntity<Integer>(0, HttpStatus.BAD_REQUEST.INTERNAL_SERVER_ERROR);
+		}
 	}
 
 	@GetMapping("/{tno}")

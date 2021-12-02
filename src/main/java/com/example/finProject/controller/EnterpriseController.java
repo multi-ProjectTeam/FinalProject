@@ -1,7 +1,9 @@
 package com.example.finProject.controller;
 
 import java.lang.reflect.Type;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,19 +15,25 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.finProject.Service.FinanceService;
+import com.example.finProject.dto.Cart;
 import com.example.finProject.dto.Enterprise;
 import com.example.finProject.dto.Image;
 import com.example.finProject.dto.Menu;
 import com.example.finProject.dto.Order;
 import com.example.finProject.dto.OrderDetail;
+import com.example.finProject.dto.ReportView;
 import com.example.finProject.dto.Table;
 import com.example.finProject.mapper.EnterpriseMapper;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
+
+import reactor.util.annotation.Nullable;
 
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 @RestController
@@ -34,16 +42,20 @@ public class EnterpriseController {
 
 	@Autowired
 	private EnterpriseMapper mapper;
+	@Autowired
+	FinanceService fService;
 
 	// 업체 추가하기
-	@PostMapping("")
+	@PostMapping("/register")
 	public String enterprise(@RequestBody String param) {
+		int insertResult = 0;
 		JsonObject result = new JsonObject();
 		result.addProperty("status", false);
 		Gson gson = new Gson();
 
 		try {
-			JsonObject json = gson.fromJson(param, JsonObject.class);
+			JsonObject obj = gson.fromJson(param,  JsonObject.class);
+			JsonObject json = gson.fromJson(obj.get("registerInfo"), JsonObject.class);
 			System.out.println(json);
 
 			String PASSWORD = json.get("password").getAsString();
@@ -54,21 +66,24 @@ public class EnterpriseController {
 			String DETAIL_ADDRESS = json.get("detail_address").getAsString();
 			String PHONE = json.get("phone").getAsString();
 			String EMAIL = json.get("email").getAsString();
-			String INTRODUCTION = json.get("introduction").getAsString();
-			int OPEN1 = json.get("open1").getAsInt();
-			int CLOSE1 = json.get("close1").getAsInt();
-			int OPEN2 = json.get("open2").getAsInt();
-			int CLOSE2 = json.get("close2").getAsInt();
-			String EIMAGE = json.get("eimage").getAsString();
-			String ECATEGORY = json.get("ecategory").getAsString();
+//			String INTRODUCTION = json.get("introduction").getAsString();
+//			int OPEN1 = json.get("open1").getAsInt();
+//			int CLOSE1 = json.get("close1").getAsInt();
+//			int OPEN2 = json.get("open2").getAsInt();
+//			int CLOSE2 = json.get("close2").getAsInt();
+//			String EIMAGE = json.get("eimage").getAsString();
+//			String ECATEGORY = json.get("ecategory").getAsString();
+			insertResult = mapper.POSTenterprise(PASSWORD, ENAME, POSTCODE, ROAD_ADDRESS, JIBUN_ADDRESS, DETAIL_ADDRESS, PHONE, EMAIL);
 
-			mapper.POSTenterprise(PASSWORD, ENAME, POSTCODE, ROAD_ADDRESS, JIBUN_ADDRESS, DETAIL_ADDRESS, PHONE, EMAIL,
-					INTRODUCTION, OPEN1, CLOSE1, OPEN2, CLOSE2, EIMAGE, ECATEGORY);
+//			int eno = mapper.POSTenterpriseResponse(PASSWORD, ENAME);
 
-			int eno = mapper.POSTenterpriseResponse(PASSWORD, ENAME);
-
-			result.addProperty("eno", eno);
-			result.addProperty("status", true);
+//			result.addProperty("eno", eno);
+			System.out.println(insertResult);
+			if(insertResult > 0) {				
+				result.addProperty("status", true);
+			}else {
+				result.addProperty("status", false);
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -166,6 +181,12 @@ public class EnterpriseController {
 		
 		return result.toString();
 	}
+	
+	@GetMapping("/{eno}/categories/{mcategories}")
+	public String[] getMenuByCategory(@PathVariable("eno") int eno, @PathVariable("mcategories") String mCategories){
+		String[] arr = mapper.GETmenuByCategory(eno, mCategories);
+		return arr;
+	}
 
 	// 이미지(image) 레이어
 	@GetMapping("/{eno}/images")
@@ -220,6 +241,24 @@ public class EnterpriseController {
 		
 		return result.toString();
 	}
+	
+	// 장바구니(cart) 레이어
+	@GetMapping("/{eno}/cart")
+	public String getCart(@PathVariable("eno") int eno) {
+		Cart[] menus = mapper.GETcarts(eno);
+
+		JsonObject result = new JsonObject();
+		Gson gson = new Gson();
+		JsonArray jsonArr =new JsonArray();
+		for( Cart element : menus) {
+			JsonObject insertJson = gson.fromJson(gson.toJson(element), JsonObject.class);
+			jsonArr.add(insertJson);
+		}
+		
+		result.add("menus", jsonArr);
+		
+		return result.toString();
+	}
 
 	// 주문(order) 레이어
 	@GetMapping("/{eno}/orders")
@@ -255,5 +294,39 @@ public class EnterpriseController {
 		result.add("orderdetails", jsonArr);
 		
 		return result.toString();
+	}
+	
+	// 매출 현황 레이어
+	@GetMapping("/{eno}/finance")
+	public Map<String,Object> getSales(@PathVariable("eno") int eno, 
+									@RequestParam("ct")String categoryType, 
+									@RequestParam("pc")String periodCategory, 
+									@Nullable @RequestParam("mc")String menuCategory,
+									@Nullable @RequestParam("m")String menu,
+									@RequestParam("pt")String periodType,
+									@RequestParam("sp")String startPeriod,
+									@RequestParam("ep")String endPeriod){
+
+		Map<String,Object> map = new HashMap<>();
+		
+		if(categoryType.equals("sales")) {
+			map.put("year",fService.getSalesByYear(eno, startPeriod, endPeriod));
+			map.put("quater", fService.getSalesByQuater(eno,startPeriod,endPeriod));
+			map.put("month", fService.getSalesByMonth(eno, "Year", startPeriod, endPeriod));
+			map.put("time", fService.getSalesByTime(eno, "Year", startPeriod, endPeriod));
+			Map<String,List<ReportView>> temp = fService.getSalesList(eno, startPeriod, endPeriod);
+			map.put("saleslist", temp);
+			map.put("keylist", temp.keySet());
+		}else if(categoryType.equals("menu")) {
+			map.put("year",fService.getMenuSalesByYear(eno, startPeriod, endPeriod, menu));
+			map.put("quater", fService.getMenuSalesByQuater(eno, startPeriod, endPeriod, menu));
+			map.put("month", fService.getMenuSalesByMonth(eno, "Year", startPeriod, endPeriod, menu));
+			map.put("time", fService.getMenuSalesByTime(eno, "Year", startPeriod, endPeriod, menu));
+			Map<String,List<ReportView>> temp = fService.getMenuSalesList(eno, startPeriod, endPeriod,menu);
+			map.put("saleslist", temp);
+			map.put("keylist", temp.keySet());
+		}
+		
+		return map;
 	}
 }

@@ -36,4 +36,7 @@ public interface TableMapper {
 	
 	@Select("select count(tno) from `table` where eno=${eno} and state='y'")
 	public int getOccupiedNum(@Param("eno") int eno);
+	
+	@Update("update `table` set state='y', ocode=#{ocode} where eno=#{eno} and tno=#{tno}")
+	public int updateTable(@Param("eno")int eno,@Param("tno")int tno,@Param("ocode")int ocode);
 }
