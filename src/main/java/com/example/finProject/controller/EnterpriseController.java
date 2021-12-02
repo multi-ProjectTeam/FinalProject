@@ -329,4 +329,12 @@ public class EnterpriseController {
 		
 		return map;
 	}
+	
+	@GetMapping("/count")
+	public int GETEntNo() {
+		int result = 0;
+		result = mapper.GETEntNo();
+		System.out.println(result);
+		return result;
+	}
 }

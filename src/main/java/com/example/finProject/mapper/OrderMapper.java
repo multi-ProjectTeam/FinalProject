@@ -35,5 +35,5 @@ public interface OrderMapper {
 	public OrderDetail[] GETorderdetails(@Param("ENO")int ENO, @Param("OCODE")int OCODE);
 	
 	@Update("Update `order` set payment='Y', ptime=current_timestamp where ocode=#{OCODE}")
-	public void payment(@Param("OCODE")int OCODE);
+	public int payment(@Param("OCODE")int OCODE);
 }

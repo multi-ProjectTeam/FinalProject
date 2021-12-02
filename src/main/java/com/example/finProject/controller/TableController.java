@@ -1,7 +1,10 @@
 package com.example.finProject.controller;
 
 import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +21,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.finProject.dto.Table;
+import com.example.finProject.dto.TableView;
+import com.example.finProject.mapper.OrderMapper;
 import com.example.finProject.mapper.TableMapper;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -30,6 +35,8 @@ public class TableController {
 	
 	@Autowired
 	private TableMapper mapper;
+	@Autowired
+	private OrderMapper oMapper;
 
 	@PostMapping("")
 	public String table(@PathVariable("eno") int eno, @RequestBody String param) {
@@ -53,6 +60,40 @@ public class TableController {
 		
 		return result.toString();
 	}
+		//get occupied table by table view(mysql)
+		@GetMapping("/order")
+		public ResponseEntity<Map<String,List<TableView>>> getTableView(@PathVariable("eno")int eno){
+			List<TableView> list = null;
+			Map<String,List<TableView>> map = new HashMap<>();
+			try {
+				list = mapper.getOccupiedTables(eno);
+				int seat_num = 0;
+				
+				if(list != null) {
+					List<TableView> tempList = null;
+					for(TableView tv : list) {
+						if(tv.getSeat_num() == seat_num) {
+							tempList.add(tv);
+						} else {
+							if(seat_num != 0) {
+								map.put(String.valueOf(seat_num), tempList);
+							}
+							seat_num = tv.getSeat_num();
+							tempList = new ArrayList<>();
+							tempList.add(tv);
+						}
+					}
+					map.put(String.valueOf(seat_num), tempList);
+				}
+			}catch(Exception e) {
+				e.printStackTrace();
+			}
+			if(!map.isEmpty()) {
+				return new ResponseEntity<Map<String,List<TableView>>>(map,HttpStatus.BAD_REQUEST.OK);
+			}else {
+				return new ResponseEntity<Map<String,List<TableView>>>(map,HttpStatus.BAD_REQUEST.OK);
+			}
+		}
 	
 	@PostMapping("/{tno}/order")
 	public ResponseEntity<Integer> updateTableOrder(@PathVariable("eno")int eno, @PathVariable("tno")int tno, @RequestBody String param) {
@@ -60,7 +101,7 @@ public class TableController {
 		result.addProperty("status", false);
 		Gson gson = new Gson();
 		int state = 0;
-		
+		System.out.println(eno);
 		try {
 			JsonObject json = gson.fromJson(param, JsonObject.class);
 			state = mapper.updateTable(eno, tno, json.get("ocode").getAsInt());
@@ -74,11 +115,29 @@ public class TableController {
 			return new ResponseEntity<Integer>(0, HttpStatus.BAD_REQUEST.INTERNAL_SERVER_ERROR);
 		}
 	}
+	
+	@PostMapping("/{tno}/pay")
+	public ResponseEntity<Integer> pay(@PathVariable("eno")int eno, @PathVariable("tno")int tno){
+		int oState = 0;
+		int tState = 0;
+		try {
+			int ocode = mapper.GETtable(tno,eno).getOcode();
+			oState = oMapper.payment(ocode);
+			tState = mapper.updateTablePay(eno, tno);
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+		
+		if(oState == 1 && tState == 1) {
+			return new ResponseEntity<Integer>(1, HttpStatus.BAD_REQUEST.OK);
+		}else {
+			return new ResponseEntity<Integer>(0, HttpStatus.BAD_REQUEST.INTERNAL_SERVER_ERROR);
+		}
+	}
 
 	@GetMapping("/{tno}")
 	public Table getTable(@PathVariable("eno") int eno, @PathVariable("tno") int tno) {
-		
-		Table table = mapper.GETtable(tno);
+		Table table = mapper.GETtable(tno,eno);
 		
 		return table;
 	}
@@ -90,7 +149,7 @@ public class TableController {
 		Gson gson = new Gson();
 		
 		try {
-			Table table = mapper.GETtable(tno);
+			Table table = mapper.GETtable(tno,eno);
 			String tempJson = gson.toJson(table);
 			JsonObject insertJson = gson.fromJson(tempJson, JsonObject.class);
 			JsonObject json = gson.fromJson(param, JsonObject.class);

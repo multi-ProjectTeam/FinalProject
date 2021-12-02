@@ -72,4 +72,7 @@ public interface EnterpriseMapper {
 	
 	@Select("Select * from `orderdetail` where eno=#{ENO}")
 	public OrderDetail[] GETorderdetails(@Param("ENO")int ENO);
+
+	@Select("SELECT AUTO_INCREMENT FROM information_schema.tables WHERE table_name = `enterprise` AND table_schema = DATABASE( )")
+	public int GETEntNo();
 }
