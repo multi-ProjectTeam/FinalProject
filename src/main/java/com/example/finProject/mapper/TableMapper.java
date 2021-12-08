@@ -20,8 +20,8 @@ public interface TableMapper {
 	@Select("Select tno from `table` where eno=#{ENO} order by tno desc limit 1")
 	public int POSTtableResponse(@Param("ENO") int ENO);
 	
-	@Select("select * from `table` where TNO=#{TNO}")
-	public Table GETtable(@Param("TNO") int TNO);
+	@Select("select * from `table` where TNO=#{TNO} and eno=#{eno}")
+	public Table GETtable(@Param("TNO") int TNO, @Param("eno")int eno);
 	
 	@Update("Update `table` set eno=#{ENO}, seat_num=#{SEAT_NUM}, window_seat=#{WINDOW_SEAT},"
 			+ "`like`=#{LIKE}, `state`=#{STATE} where tno=#{TNO}")
@@ -39,4 +39,7 @@ public interface TableMapper {
 	
 	@Update("update `table` set state='y', ocode=#{ocode} where eno=#{eno} and tno=#{tno}")
 	public int updateTable(@Param("eno")int eno,@Param("tno")int tno,@Param("ocode")int ocode);
+	
+	@Update("update `table' set state='n', ocode=null where eno=#{eno} and tno=#{tno}")
+	public int updateTablePay(@Param("eno")int eno, @Param("tno")int tno);
 }

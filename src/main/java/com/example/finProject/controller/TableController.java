@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.finProject.dto.Table;
+import com.example.finProject.mapper.OrderMapper;
 import com.example.finProject.mapper.TableMapper;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -30,6 +31,8 @@ public class TableController {
 	
 	@Autowired
 	private TableMapper mapper;
+	@Autowired
+	private OrderMapper oMapper;
 
 	@PostMapping("")
 	public String table(@PathVariable("eno") int eno, @RequestBody String param) {
@@ -74,11 +77,30 @@ public class TableController {
 			return new ResponseEntity<Integer>(0, HttpStatus.BAD_REQUEST.INTERNAL_SERVER_ERROR);
 		}
 	}
+	
+	@PostMapping("/{tno}/pay")
+	public ResponseEntity<Integer> pay(@PathVariable("eno")int eno, @PathVariable("tno")int tno){
+		int oState = 0;
+		int tState = 0;
+		
+		try {
+			int ocode = mapper.GETtable(tno,eno).getOcode();
+			oState = oMapper.payment(ocode);
+			tState = mapper.updateTablePay(eno, tno);
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+		
+		if(oState == 1 && tState == 1) {
+			return new ResponseEntity<Integer>(1, HttpStatus.BAD_REQUEST.OK);
+		}else {
+			return new ResponseEntity<Integer>(0, HttpStatus.BAD_REQUEST.INTERNAL_SERVER_ERROR);
+		}
+	}
 
 	@GetMapping("/{tno}")
 	public Table getTable(@PathVariable("eno") int eno, @PathVariable("tno") int tno) {
-		
-		Table table = mapper.GETtable(tno);
+		Table table = mapper.GETtable(tno,eno);
 		
 		return table;
 	}
@@ -90,7 +112,7 @@ public class TableController {
 		Gson gson = new Gson();
 		
 		try {
-			Table table = mapper.GETtable(tno);
+			Table table = mapper.GETtable(tno,eno);
 			String tempJson = gson.toJson(table);
 			JsonObject insertJson = gson.fromJson(tempJson, JsonObject.class);
 			JsonObject json = gson.fromJson(param, JsonObject.class);

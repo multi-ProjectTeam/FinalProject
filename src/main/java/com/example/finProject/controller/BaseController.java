@@ -61,7 +61,7 @@ public class BaseController {
 		return result.toString();
 	}
 
-	// 검색된 업체들 가져오기
+	 //검색된 업체들 가져오기
 	@GetMapping("/enterprises")
 	public ResponseEntity<List<EnterpriseDocument>> findBusinessBySearchInCafe(@RequestParam(value = "q") String q,
 			@RequestParam(value = "option") String option) {
